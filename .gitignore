@@ -1,3 +1,5 @@
 /bin/
 Externals/__MACOSX/
 Externals/lucene-7.3.1/
+.settings/
+.classpath
