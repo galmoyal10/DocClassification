@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+import org.apache.lucene.search.TopDocs;
+
 public class Main {
 
 	private static final String QUERY_FILE_FIELD = "queryFile";
@@ -46,8 +48,17 @@ public class Main {
     		}
     		fileReader.close();
 
-    		SearchEngine se = new SearchEngine(queryFile, docsFile, outputFile, mode);
-    		se.run();
+    		IndexingEngine ie = new IndexingEngine(docsFile, outputFile, mode);
+    		ie.run();
+    		
+    		SearchEngine se = new SearchEngine(queryFile, ie, ie.getCorpusTopTerms());
+    		TopDocs[] results = se.searchQueries();
+    		
+    		for(int i=0; i<results.length; ++i)
+    		{
+    			System.out.println("Query #" + i + ": " + results[i].totalHits + " documents found.");
+    		}
+    		
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
