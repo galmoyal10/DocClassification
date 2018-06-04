@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -18,9 +19,9 @@ public class Main {
     private static final String BASIC = "basic";
     
     public static void main(String[] args) {
+    	String paramFileName = args[0];
+    	File paramFile = new File(paramFileName);
         try {           
-            String paramFileName = args[0];
-            File paramFile = new File(paramFileName);
             FileReader fileReader = new FileReader(paramFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             StringBuffer stringBuffer = new StringBuffer();
@@ -50,7 +51,6 @@ public class Main {
                 stringBuffer.append(line);
                 stringBuffer.append("\n");
             }
-            fileReader.close();
 
             IndexingEngine ie = new IndexingEngine(docsFile, mode);
             ie.run();
@@ -60,11 +60,11 @@ public class Main {
             
             
             writeResults(outputFile, results);
+            // TODO - truth file path
+            List<Result> truth = SearchResults.loadFromFile("data/truth.txt");
+            List<Result> ourResults = SearchResults.results(results);
             
-            for(int i=0; i<results.length; ++i)
-            {
-                System.out.println("Query #" + i + ": " + results[i].totalHits + " documents found.");
-            }
+            SearchResults.compareSearchResults(ourResults, truth);
         } catch (Exception e) {
             e.printStackTrace();
         }
