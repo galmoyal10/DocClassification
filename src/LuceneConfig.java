@@ -11,8 +11,8 @@ public class LuceneConfig {
     String docsFile = null;
     String outputFile = null;
     String truthFile = null;
-    boolean mode = false;
-    double relevanceThreashold = 12;
+    boolean basicMode = false;
+    double relevanceThreashold = 13.25;
     
     
     LuceneConfig(String configPath) throws IOException
@@ -34,7 +34,8 @@ public class LuceneConfig {
                     outputFile = tokens[1];
                     break;
                 case MODE_FIELD:
-                    mode = tokens[1].compareTo(BASIC) == 0 ? true : false;
+                	// true == basic, false == improved
+                    basicMode = tokens[1].compareTo(BASIC) == 0 ? true : false;
                     break;
                 case TRUTH_FILE_FIELD:
                 	truthFile = tokens[1];

@@ -81,8 +81,10 @@ public class SearchResults {
 	 * compares search engine results with truth
 	 * @param results
 	 * @param actual
+	 * 
+	 * @return the combined measure F - harmonic mean of R and P
 	 */
-	static void compareSearchResults(List<Result> results, List<Result> actual) {
+	static double compareSearchResults(List<Result> results, List<Result> actual) {
 		List<Double> precisions = new ArrayList<>();
 		List<Double> recalls = new ArrayList<>();
 		Iterator<Result> resultsIter = results.iterator();
@@ -105,8 +107,13 @@ public class SearchResults {
 				recalls.add(stats[1]);
 			}
 		}
+		
+		double totalPrecision = precisions.stream().mapToDouble(f -> f.doubleValue()).sum() / precisions.size();
+		double totalRecall = recalls.stream().mapToDouble(f -> f.doubleValue()).sum() / recalls.size();
 	
-		System.out.println("Total: Precision - " + (precisions.stream().mapToDouble(f -> f.doubleValue()).sum() / precisions.size()) + 
-								" Recall - " + (recalls.stream().mapToDouble(f -> f.doubleValue()).sum() / recalls.size()));
+		System.out.println("Total: Precision - " + totalPrecision + 
+								" Recall - " + totalRecall) ;
+		
+		return 1/(0.5*(1/totalPrecision + 1/totalRecall)); 
 	}
 }
