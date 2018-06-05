@@ -1,6 +1,10 @@
+package src;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -38,12 +42,14 @@ public class IndexingEngine {
         return documents;
     }
     
-    private void normalizeDoc(String document) throws IOException 
+    private String normalizeDoc(String document) throws IOException 
     {
-        for (String s: IndexingEngine.ILLEGAL_STRINGS)
+    	document = document.toLowerCase();
+        for (Map.Entry<String,String> e: IndexingEngine.ILLEGAL_STRINGS.entrySet())
         {
-            document.replaceAll(s, "");
+            document = document.replaceAll(e.getKey(), e.getValue());
         }
+        return document;
     }
     
     private void indexDocuments(String[] documents) throws IOException {
@@ -51,7 +57,7 @@ public class IndexingEngine {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter indexWriter = new IndexWriter(this._index, config);
         for (String document: documents) {
-            this.normalizeDoc(document);
+        	document = this.normalizeDoc(document);
             
             Document d = new Document();
             FieldType f = new FieldType();
@@ -80,5 +86,8 @@ public class IndexingEngine {
     private boolean _mode;
     private static final String DOCUMENT_REGEX = "(?:\\*TEXT.*\\d+.*|\\*STOP)";
     private static final int STOP_WORDS = 20;
-    private static final String[] ILLEGAL_STRINGS = {"-"};
+    private static final HashMap<String,String> ILLEGAL_STRINGS = new HashMap<>();
+    static {
+    	ILLEGAL_STRINGS.put("-", " ");    	
+    }
 }
