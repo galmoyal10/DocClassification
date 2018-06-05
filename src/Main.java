@@ -1,3 +1,4 @@
+package src;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,58 +12,23 @@ import org.apache.lucene.search.TopDocs;
 
 public class Main {
 
-    private static final String QUERY_FILE_FIELD = "queryFile";
-    private static final String DOCS_FILE_FIELD = "docsFile";
-    private static final String OUT_FILE_FIELD = "outputFile";
-    private static final String MODE_FIELD = "retrievalAlgorithm";
 
-    private static final String BASIC = "basic";
     
     public static void main(String[] args) {
-    	String paramFileName = args[0];
-    	File paramFile = new File(paramFileName);
         try {           
-            FileReader fileReader = new FileReader(paramFile);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            StringBuffer stringBuffer = new StringBuffer();
-            
-            String queryFile = null;
-            String docsFile = null;
-            String outputFile = null;
-            boolean mode = false;
-            
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                String[] tokens = line.split("=");
-                switch (tokens[0]) {
-                    case QUERY_FILE_FIELD:
-                        queryFile = tokens[1];
-                        break;
-                    case DOCS_FILE_FIELD:
-                        docsFile = tokens[1];
-                        break;
-                    case OUT_FILE_FIELD:
-                        outputFile = tokens[1];
-                        break;
-                    case MODE_FIELD:
-                        mode = tokens[1].compareTo(BASIC) == 0 ? true : false;
-                        break;
-                }
-                stringBuffer.append(line);
-                stringBuffer.append("\n");
-            }
 
-            IndexingEngine ie = new IndexingEngine(docsFile, mode);
+            LuceneConfig config = new LuceneConfig(args[0]);
+           
+            IndexingEngine ie = new IndexingEngine(config.docsFile, config.mode);
             ie.run();
             
-            SearchEngine se = new SearchEngine(queryFile, ie, ie.getCorpusTopTerms());
+            SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms());
             TopDocs[] results = se.searchQueries();
             
             
-            writeResults(outputFile, results);
-            // TODO - truth file path
-            List<Result> truth = SearchResults.loadFromFile("data/truth.txt");
-            List<Result> ourResults = SearchResults.results(results);
+            writeResults(config.outputFile, results);
+            List<Result> truth = SearchResults.loadFromFile(config.truthFile);
+            List<Result> ourResults = SearchResults.results(results, config.relevanceThreashold);
             
             SearchResults.compareSearchResults(ourResults, truth);
         } catch (Exception e) {
