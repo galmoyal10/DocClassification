@@ -125,34 +125,7 @@ public class IndexingEngine {
         ILLEGAL_STRINGS.put("aliti\\b","al")     ; //  formaliti      ->  formal
         ILLEGAL_STRINGS.put("iviti\\b","ive")    ; //  sensitiviti    ->  sensitive
         ILLEGAL_STRINGS.put("biliti\\b","ble")   ; //   sensibiliti    ->  sensible
-        
-        
-        ILLEGAL_STRINGS.put("icate","ic");		    //		triplicate		->		triplic
-        ILLEGAL_STRINGS.put("ative","");				    //		formative		->		form
-        ILLEGAL_STRINGS.put("alize","al");		    //		formalize		->		formal
-        ILLEGAL_STRINGS.put("iciti","ic");		    //		electriciti		->		electric
-        ILLEGAL_STRINGS.put("ical","ic");		    //		electrical		->		electric
-        ILLEGAL_STRINGS.put("ful","");			    	//	hopeful		->		hope
-        ILLEGAL_STRINGS.put("ness","");			    //		goodness		->		good
-        ILLEGAL_STRINGS.put("al","");		    		//	revival		->		reviv
-        ILLEGAL_STRINGS.put("ance","");			    	//	allowance		->		allow
-        ILLEGAL_STRINGS.put("ence","");			    	//	inference		->		infer
-        ILLEGAL_STRINGS.put("er","");			    		//	airliner		->		airlin
-        ILLEGAL_STRINGS.put("ic","");			    		//	gyroscopic		->		gyroscop
-        ILLEGAL_STRINGS.put("able","");			    	//	adjustable		->		adjust
-        ILLEGAL_STRINGS.put("ible","");			    	//	defensible		->		defens
-        ILLEGAL_STRINGS.put("ant","");			    	//	irritant		->		irrit
-        ILLEGAL_STRINGS.put("ement","");			    	//	replacement		->		replac
-        ILLEGAL_STRINGS.put("ment","");			    	//	adjustment		->		adjust
-        ILLEGAL_STRINGS.put("ent","");			    	//	dependent		->		depend
-        ILLEGAL_STRINGS.put("ion","");		    		//	adoption		->		adopt
-        ILLEGAL_STRINGS.put("ou","");		    		//	homologou		->		homolog
-        ILLEGAL_STRINGS.put("ism","");			    	//	communism		->		commun
-        ILLEGAL_STRINGS.put("ate","");			    	//	activate		->		activ
-        ILLEGAL_STRINGS.put("iti","");			    	//	angulariti		->		angular
-        ILLEGAL_STRINGS.put("ous","");			    	//	homologous		->		homolog
-        ILLEGAL_STRINGS.put("ive","");			    	//	effective		->		effect
-        ILLEGAL_STRINGS.put("ize","");			    	//	bowdlerize		->		bowdler
+
     
     }
 }
