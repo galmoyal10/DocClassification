@@ -12,7 +12,7 @@ public class LuceneConfig {
     String outputFile = null;
     String truthFile = null;
     boolean mode = false;
-    double relevanceThreashold = 10;
+    double relevanceThreashold = 12;
     
     
     LuceneConfig(String configPath) throws IOException
