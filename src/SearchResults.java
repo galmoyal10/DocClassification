@@ -1,3 +1,4 @@
+package src;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,23 +13,40 @@ import org.apache.lucene.search.TopDocs;
 public class SearchResults {
 	
 	/**
-	 * formats search engine results
+	 * formats search engine results with relevance filtration
 	 * @param results - results from search engine
+	 * @param threashold - the T value of relevance threshold to enforce 
 	 * @return
 	 */
-	static List<Result> results(TopDocs[] results) {
+	static List<Result> results(TopDocs[] results, Double threashold) {
 		List<Result> parsedResults = new ArrayList<>();
 		Integer queryId = 1;
-		for (TopDocs result: results) {
+		for (TopDocs result: results) 
+		{
 			List<Integer> docIds = new ArrayList<>();
-            for (ScoreDoc score: result.scoreDocs) {
-                docIds.add(score.doc);
+            for (ScoreDoc score: result.scoreDocs) 
+            {
+            	if(score.score >= threashold)
+            	{
+            		docIds.add(score.doc);            		
+            	}
             }
 			parsedResults.add(new Result(queryId, docIds.toArray(new Integer[docIds.size()])));
 			++queryId;
 		}
 		return parsedResults;
 	}
+	
+	/**
+	 * formats search engine results
+	 * @param results - results from search engine
+	 * @return
+	 */
+	static List<Result> results(TopDocs[] results)
+	{
+		return SearchResults.results(results, 0.0);
+	}
+	
 	
 	/**
 	 * load truth results
@@ -75,9 +93,19 @@ public class SearchResults {
 			Result actualResult = actualIter.next();
 			Double[] stats = Result.compare(result, actualResult);
 			System.out.println("Query " + result.queryId.toString() + " Precision - " + stats[0].toString() + ", Recall - " + stats[1].toString());
-			precisions.add(stats[0]);
-			recalls.add(stats[1]);
+			
+			//filter out the irrelevant stats
+			if(stats[0]!=Double.POSITIVE_INFINITY ) 
+			{
+				precisions.add(stats[0]);
+			}
+			
+			if(stats[1] != Double.POSITIVE_INFINITY)
+			{
+				recalls.add(stats[1]);
+			}
 		}
+	
 		System.out.println("Total: Precision - " + (precisions.stream().mapToDouble(f -> f.doubleValue()).sum() / precisions.size()) + 
 								" Recall - " + (recalls.stream().mapToDouble(f -> f.doubleValue()).sum() / recalls.size()));
 	}
