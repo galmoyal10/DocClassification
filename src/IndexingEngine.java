@@ -88,6 +88,43 @@ public class IndexingEngine {
     private static final int STOP_WORDS = 20;
     private static final HashMap<String,String> ILLEGAL_STRINGS = new HashMap<>();
     static {
-    	ILLEGAL_STRINGS.put("-", " ");    	
+    	ILLEGAL_STRINGS.put("-", " ");
+
+    	// http://snowball.tartarus.org/algorithms/porter/stemmer.html
+    	//Porter Stemmer - step 1
+    	ILLEGAL_STRINGS.put("sses\\b", "ss");
+    	ILLEGAL_STRINGS.put("ies\\b", "i");
+    	ILLEGAL_STRINGS.put("s\\b", "");
+//    	
+//    	//Porter Stemmer - step 2
+    	ILLEGAL_STRINGS.put("eed\\b", "ee");
+    	ILLEGAL_STRINGS.put("ed\\b", "");
+    	ILLEGAL_STRINGS.put("ing\\b", "");
+    	
+    	ILLEGAL_STRINGS.put("at\\b", "ate");
+    	ILLEGAL_STRINGS.put("bl\\b", "ble");
+    	ILLEGAL_STRINGS.put("iz\\b", "ize");
+    	
+        ILLEGAL_STRINGS.put("ational","ate")  ; //    relational     ->  relate
+        ILLEGAL_STRINGS.put("tional","tioN"); //     conditional    ->  condition
+        ILLEGAL_STRINGS.put("enci","ence")    ; // valenci        ->  valence
+        ILLEGAL_STRINGS.put("anci","ance")    ; // hesitanci      ->  hesitance
+        ILLEGAL_STRINGS.put("izer","ize")     ; // digitizer      ->  digitize
+        ILLEGAL_STRINGS.put("abli","able")    ; // conformabli    ->  conformable
+        ILLEGAL_STRINGS.put("alli","al")      ; // radicalli      ->  radical
+        ILLEGAL_STRINGS.put("entli","ent")    ; //  differentli    ->  different
+        ILLEGAL_STRINGS.put("eli","e")        ; //vileli        - >  vile
+        ILLEGAL_STRINGS.put("ousli","ous")    ; //  analogousli    ->  analogous
+        ILLEGAL_STRINGS.put("ization","ize")  ; //    vietnamization ->  vietnamize
+        ILLEGAL_STRINGS.put("ation","ate")    ; //  predication    ->  predicate
+        ILLEGAL_STRINGS.put("ator","ate")     ; // operator       ->  operate
+        ILLEGAL_STRINGS.put("alism","al")     ; //  feudalism      ->  feudal
+        ILLEGAL_STRINGS.put("iveness","ive")  ; //    decisiveness   ->  decisive
+        ILLEGAL_STRINGS.put("fulness","ful")  ; //    hopefulness    ->  hopeful
+        ILLEGAL_STRINGS.put("ousness","ous")  ; //    callousness    ->  callous
+        ILLEGAL_STRINGS.put("aliti","al")     ; //  formaliti      ->  formal
+        ILLEGAL_STRINGS.put("iviti","ive")    ; //  sensitiviti    ->  sensitive
+        ILLEGAL_STRINGS.put("biliti","ble")   ; //   sensibiliti    ->  sensible
+    
     }
 }
