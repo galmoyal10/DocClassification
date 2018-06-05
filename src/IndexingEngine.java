@@ -42,7 +42,7 @@ public class IndexingEngine {
         return documents;
     }
     
-    private String normalizeDoc(String document) throws IOException 
+    public static String normalizeString(String document) throws IOException 
     {
     	document = document.toLowerCase();
         for (Map.Entry<String,String> e: IndexingEngine.ILLEGAL_STRINGS.entrySet())
@@ -57,7 +57,7 @@ public class IndexingEngine {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter indexWriter = new IndexWriter(this._index, config);
         for (String document: documents) {
-        	document = this.normalizeDoc(document);
+        	document = this.normalizeString(document);
             
             Document d = new Document();
             FieldType f = new FieldType();
