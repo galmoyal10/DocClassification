@@ -1,8 +1,9 @@
-package src;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -11,11 +12,12 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 public class SearchEngine {
     
-    SearchEngine(String queryFile, IndexingEngine ie, String [] stopWords) throws IOException
+    SearchEngine(String queryFile, IndexingEngine ie, String [] stopWords, double relevanceThreshold) throws IOException
     {
         this._queryFile = queryFile;
         CharArraySet stopWordSet = new CharArraySet(Arrays.asList(stopWords),true);
@@ -23,9 +25,36 @@ public class SearchEngine {
         //Standard Analyzer is the most sophisticated analyzer and contains removal of stop words
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer(stopWordSet));
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(ie.getIndexDir()));
+        this._relevanceThreshold = relevanceThreshold;
     }
     
-    public TopDocs[] searchQueries() throws IOException, ParseException
+    
+	/**
+	 * formats search engine results with relevance filtration
+	 * @param results - results from search engine
+	 * @param threashold - the T value of relevance threshold to enforce 
+	 * @return
+	 */
+	static List<Result> filterResults(TopDocs[] results, Double threashold) {
+		List<Result> parsedResults = new ArrayList<>();
+		Integer queryId = 1;
+		for (TopDocs result: results) 
+		{
+			List<Integer> docIds = new ArrayList<>();
+            for (ScoreDoc score: result.scoreDocs) 
+            {
+            	if(score.score >= threashold)
+            	{
+            		docIds.add(score.doc);            		
+            	}
+            }
+			parsedResults.add(new Result(queryId, docIds.toArray(new Integer[docIds.size()])));
+			++queryId;
+		}
+		return parsedResults;
+	}
+    
+    public List<Result> searchQueries() throws IOException, ParseException
     {
         Query [] queries = this.parseQueriesFile(this._queryFile);
         TopDocs[] results = new TopDocs[queries.length];
@@ -38,7 +67,7 @@ public class SearchEngine {
             results[i] = this._indexSearcher.search(queries[i], LuceneConstants.MAX_SEARCH);
         }
         
-        return results;
+        return filterResults(results, this._relevanceThreshold);
     }
     
     
@@ -59,5 +88,6 @@ public class SearchEngine {
     private IndexSearcher _indexSearcher;
     private QueryParser _queryParser;
     private String _queryFile;
+    private double _relevanceThreshold;
     private static final String QUERY_REGEX = "\\*FIND\\s*\\d+.*";
 }

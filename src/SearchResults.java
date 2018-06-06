@@ -1,4 +1,3 @@
-package src;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,48 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 
-
-public class SearchResults {
-	
-	/**
-	 * formats search engine results with relevance filtration
-	 * @param results - results from search engine
-	 * @param threashold - the T value of relevance threshold to enforce 
-	 * @return
-	 */
-	static List<Result> results(TopDocs[] results, Double threashold) {
-		List<Result> parsedResults = new ArrayList<>();
-		Integer queryId = 1;
-		for (TopDocs result: results) 
-		{
-			List<Integer> docIds = new ArrayList<>();
-            for (ScoreDoc score: result.scoreDocs) 
-            {
-            	if(score.score >= threashold)
-            	{
-            		docIds.add(score.doc);            		
-            	}
-            }
-			parsedResults.add(new Result(queryId, docIds.toArray(new Integer[docIds.size()])));
-			++queryId;
-		}
-		return parsedResults;
-	}
-	
-	/**
-	 * formats search engine results
-	 * @param results - results from search engine
-	 * @return
-	 */
-	static List<Result> results(TopDocs[] results)
-	{
-		return SearchResults.results(results, 0.0);
-	}
-	
-	
+public class SearchResults {	
 	/**
 	 * load truth results
 	 * @param fileName - path of truth file

@@ -1,42 +1,33 @@
-package src;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 
 public class Main {
-
-
-    
     public static void main(String[] args) {
         try {           
 
-            LuceneConfig config = new LuceneConfig(args[0]);
+            Config config = new Config(args[0]);
            
             IndexingEngine ie = new IndexingEngine(config.docsFile, config.basicMode);
             ie.run();
             
-            SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms());
-            TopDocs[] results = se.searchQueries();
+            SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms(), LuceneConstants.RELEVANCE_THRESHOLD);
+            List<Result> results = se.searchQueries();
             
             
             writeResults(config.outputFile, results);
             List<Result> truth = SearchResults.loadFromFile(config.truthFile);
-            List<Result> ourResults = SearchResults.results(results, config.relevanceThreashold);
             
-            SearchResults.compareSearchResults(ourResults, truth);
+            SearchResults.compareSearchResults(results, truth);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    private static void writeResults(String fileName, TopDocs[] results) throws IOException {
+    private static void writeResults(String fileName, List<Result> results) throws IOException {
         File outFile = new File(fileName);
         if (outFile.exists()) {
             outFile.delete();
@@ -45,10 +36,10 @@ public class Main {
         }
         BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
         Integer queryId = 1;
-        for (TopDocs result: results) {
+        for (Result result: results) {
             String resultFormat = queryId.toString();
-            for (ScoreDoc score: result.scoreDocs) {
-                resultFormat += " " + Integer.toString(score.doc);          
+            for (Integer docId: result.documents) {
+                resultFormat += " " + Integer.toString(docId);          
             }
             writer.write(resultFormat);
             writer.newLine();

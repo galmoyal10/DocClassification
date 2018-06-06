@@ -1,21 +1,16 @@
-package src;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class LuceneConfig {
+public class Config {
 
 	String queryFile = null;
     String docsFile = null;
     String outputFile = null;
     String truthFile = null;
-    boolean basicMode = false;
-    double relevanceThreashold = 13.25;
+    boolean basicMode = false;    
     
-    
-    LuceneConfig(String configPath) throws IOException
+    Config(String configPath) throws IOException
     {
     	FileReader fileReader = new FileReader(configPath);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
