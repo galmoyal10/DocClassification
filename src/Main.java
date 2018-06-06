@@ -19,7 +19,7 @@ public class Main {
 
             LuceneConfig config = new LuceneConfig(args[0]);
            
-            IndexingEngine ie = new IndexingEngine(config.docsFile, config.mode);
+            IndexingEngine ie = new IndexingEngine(config.docsFile, config.basicMode);
             ie.run();
             
             SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms());

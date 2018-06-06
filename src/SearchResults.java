@@ -110,10 +110,12 @@ public class SearchResults {
 		
 		double totalPrecision = precisions.stream().mapToDouble(f -> f.doubleValue()).sum() / precisions.size();
 		double totalRecall = recalls.stream().mapToDouble(f -> f.doubleValue()).sum() / recalls.size();
-	
-		System.out.println("Total: Precision - " + totalPrecision + 
-								" Recall - " + totalRecall) ;
+		double f = 1/(0.5*(1/totalPrecision + 1/totalRecall));
 		
-		return 1/(0.5*(1/totalPrecision + 1/totalRecall)); 
+		System.out.println("Total: Precision - " + totalPrecision + 
+								" Recall - " + totalRecall +
+								"F - " + f) ;
+		
+		return f;  
 	}
 }

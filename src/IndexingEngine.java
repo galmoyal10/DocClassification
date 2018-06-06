@@ -95,7 +95,7 @@ public class IndexingEngine {
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter indexWriter = new IndexWriter(this._index, config);
 		for (String document : documents) {
-			document = this.normalizeString(document);
+			document = IndexingEngine.normalizeString(document);
 
 			Document d = new Document();
 			FieldType f = new FieldType();
