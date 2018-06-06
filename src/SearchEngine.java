@@ -1,3 +1,4 @@
+package src;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,7 +51,7 @@ public class SearchEngine {
         Query[] searchQueries = new Query [queries.length];
         for(int i=0; i<queries.length; ++i)
         {
-            searchQueries[i] = _queryParser.parse(queries[i]);
+            searchQueries[i] = _queryParser.parse(IndexingEngine.normalizeString(queries[i]));
         }
         return searchQueries;
     }
