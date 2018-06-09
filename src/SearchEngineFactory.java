@@ -1,4 +1,6 @@
-
+/**
+ * Returns the corresponding SearchEngine according to the given mode
+ */
 public class SearchEngineFactory {
 	public static SearchEngine getSE(boolean basicMode, String queryFile, IndexingEngine ie, String [] stopWords) throws Exception
 	{

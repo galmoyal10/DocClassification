@@ -20,6 +20,11 @@ import org.apache.lucene.store.RAMDirectory;
 
 
 public class IndexingEngine {
+	/**
+	 * Initializes Indexing Engine
+	 * @param docsFile - path to documents file
+	 * @throws Exception
+	 */
 	IndexingEngine(String docsFile) throws Exception {
 		this._index = new RAMDirectory();
 		this._docsFile = docsFile;
@@ -27,28 +32,46 @@ public class IndexingEngine {
 		_normalizingStrings.put("-", " ");
 	}
 
+	/**
+	 * indexes the given documents
+	 * @throws Exception
+	 */
 	public void run() throws Exception {
 		this.indexDocuments(this.parseDocumentsFile(this._docsFile));
 	}
 
-	public Directory getIndexDir() {
+	/**
+	 * retrieves the created index
+	 */
+	public Directory getIndex() {
 		return this._index;
 	}
-
+	
 	private String[] parseDocumentsFile(String documentsFilePath) throws IOException {
 		String documentsString = new String(Files.readAllBytes(Paths.get(documentsFilePath)));
 		String[] documents = documentsString.split(DOCUMENT_REGEX);
 		return documents;
 	}
 
-	public String normalizeString(String document) throws IOException {
-		document = document.toLowerCase();
+	/**
+	 * normalizing method used for both documents and queries
+	 * @param input - the string to normalize
+	 * @return the normalized string
+	 * @throws IOException
+	 */
+	public String normalizeString(String input) throws IOException {
+		input = input.toLowerCase();
 		for (Map.Entry<String, String> e : this._normalizingStrings.entrySet()) {
-			document = document.replaceAll(e.getKey(), e.getValue());
+			input = input.replaceAll(e.getKey(), e.getValue());
 		}
-		return document;
+		return input;
 	}
 
+	/**
+	 * performs the indexing
+	 * @param documents - an array of documents
+	 * @throws IOException
+	 */
 	private void indexDocuments(String[] documents) throws IOException {
 		IndexWriter indexWriter = new IndexWriter(this._index, new IndexWriterConfig(new StandardAnalyzer()));
 		for (String document : documents) {
@@ -64,10 +87,14 @@ public class IndexingEngine {
 		indexWriter.close();
 	}
 
+	/**
+	 * returns the top <STOP_WORDS_SIZE> most frequent terms in the corpus
+	 * @throws Exception
+	 */
 	public String[] getCorpusTopTerms() throws Exception {
-		String[] topStopWords = new String[STOP_WORDS];
+		String[] topStopWords = new String[STOP_WORDS_SIZE];
 		IndexReader indexReader = DirectoryReader.open(this._index);
-		TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, STOP_WORDS, LuceneConstants.CONTENTS,
+		TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, STOP_WORDS_SIZE, LuceneConstants.CONTENTS,
 				new HighFreqTerms.TotalTermFreqComparator());
 		int stopWordIndex = 0;
 		for (TermStats commonTerm : commonTerms) {
@@ -80,6 +107,6 @@ public class IndexingEngine {
 	private Directory _index;
 	private String _docsFile;
 	private static final String DOCUMENT_REGEX = "(?:\\*TEXT.*\\d+.*|\\*STOP)";
-	private static final int STOP_WORDS = 20;
+	private static final int STOP_WORDS_SIZE = 20;
 	protected HashMap<String, String> _normalizingStrings = new HashMap<>();
 }

@@ -1,3 +1,6 @@
+/**
+ * Implements stemming method used for normalizing both documents and queries
+ */
 public class ImprovedIndexingEngine extends IndexingEngine{
 	ImprovedIndexingEngine(String docsFile) throws Exception {
 		super(docsFile);

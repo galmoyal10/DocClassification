@@ -17,16 +17,23 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 
 public class SearchEngine {
-    
-    SearchEngine(String queryFile, IndexingEngine ie, String [] stopWords, double relevanceThreshold) throws IOException
+    /**
+     * c'tor
+     * @param queriesFile - path to queries file
+     * @param index - documents index
+     * @param stopWords - stop words to use when searching
+     * @param relevanceThreshold - threshold to apply on result's scores.
+     * @throws IOException
+     */
+    SearchEngine(String queriesFile, IndexingEngine index, String [] stopWords, double relevanceThreshold) throws IOException
     {
-        this._queryFile = queryFile;
+        this._queryFile = queriesFile;
         CharArraySet stopWordSet = new CharArraySet(Arrays.asList(stopWords),true);
         
         //Standard Analyzer is the most sophisticated analyzer and contains removal of stop words
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer(stopWordSet));
-        this._index = ie;
-        this._indexSearcher = new IndexSearcher(DirectoryReader.open(ie.getIndexDir()));
+        this._index = index;
+        this._indexSearcher = new IndexSearcher(DirectoryReader.open(index.getIndex()));
         _indexSearcher.setSimilarity(new ClassicSimilarity());
         this._relevanceThreshold = relevanceThreshold;
     }
@@ -57,6 +64,12 @@ public class SearchEngine {
 		return parsedResults;
 	}
     
+	/**
+	 * performs actual search of queries using the index
+	 * @return a list of Result objects
+	 * @throws IOException
+	 * @throws ParseException
+	 */
     public List<Result> searchQueries() throws IOException, ParseException
     {
         Query [] queries = this.parseQueriesFile(this._queryFile);
@@ -72,7 +85,6 @@ public class SearchEngine {
         
         return filterResults(results, this._relevanceThreshold);
     }
-    
     
     private Query[] parseQueriesFile(String queriesFilePath) throws IOException, ParseException {
         String queriesString = new String(Files.readAllBytes(Paths.get(queriesFilePath)));

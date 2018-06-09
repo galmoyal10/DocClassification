@@ -4,12 +4,11 @@ import java.io.IOException;
 
 public class Config {
 
-	String queryFile = null;
-    String docsFile = null;
-    String outputFile = null;
-    String truthFile = null;
-    boolean basicMode = false;    
-    
+	/**
+	 * Parses configuration file, extracting all necessary parameters for the search engine
+	 * @param configPath - path to configuration file
+	 * @throws IOException
+	 */
     Config(String configPath) throws IOException
     {
     	FileReader fileReader = new FileReader(configPath);
@@ -32,6 +31,8 @@ public class Config {
                 	// true == basic, false == improved
                     basicMode = tokens[1].compareTo(BASIC) == 0 ? true : false;
                     break;
+                // Extra optional parameter added by us - truth file path
+                // When given, the program calculates search engine performance
                 case TRUTH_FILE_FIELD:
                 	truthFile = tokens[1];
                 	break;
@@ -43,6 +44,12 @@ public class Config {
 
     }
     
+    public String queryFile = null;
+    public String docsFile = null;
+    public String outputFile = null;
+    public String truthFile = null;
+    public boolean basicMode = false;    
+
     
     private static final String QUERY_FILE_FIELD = "queryFile";
     private static final String DOCS_FILE_FIELD = "docsFile";
