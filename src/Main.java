@@ -13,15 +13,14 @@ public class Main {
            
             IndexingEngine ie = IndexFactory.getIndex(config.basicMode, config.docsFile);
             ie.run();
-            
-            SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms(), LuceneConstants.RELEVANCE_THRESHOLD);
-            List<Result> results = se.searchQueries();
-            
-            
-            writeResults(config.outputFile, results);
-            List<Result> truth = SearchResults.loadFromFile(config.truthFile);
-            
-            SearchResults.compareSearchResults(results, truth);
+    		SearchEngine se = SearchEngineFactory.getSE(config.basicMode, config.queryFile, ie, ie.getCorpusTopTerms());
+    		List<Result> results = se.searchQueries();
+    		
+    		writeResults(config.outputFile, results);
+    		if (config.truthFile != null) {    			
+    			List<Result> truth = SearchResults.loadFromFile(config.truthFile);
+    			double[] res = SearchResults.compareSearchResults(results, truth);
+    		}
         } catch (Exception e) {
             e.printStackTrace();
         }

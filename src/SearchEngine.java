@@ -14,6 +14,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 
 public class SearchEngine {
     
@@ -26,6 +27,7 @@ public class SearchEngine {
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer(stopWordSet));
         this._index = ie;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(ie.getIndexDir()));
+        _indexSearcher.setSimilarity(new ClassicSimilarity());
         this._relevanceThreshold = relevanceThreshold;
     }
     
@@ -86,7 +88,7 @@ public class SearchEngine {
         return searchQueries;
     }
     
-    private IndexSearcher _indexSearcher;
+    protected IndexSearcher _indexSearcher;
     IndexingEngine _index;
     private QueryParser _queryParser;
     private String _queryFile;

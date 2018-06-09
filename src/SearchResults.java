@@ -43,7 +43,7 @@ public class SearchResults {
 	 * 
 	 * @return the combined measure F - harmonic mean of R and P
 	 */
-	static double compareSearchResults(List<Result> results, List<Result> actual) {
+	static double[] compareSearchResults(List<Result> results, List<Result> actual) {
 		List<Double> precisions = new ArrayList<>();
 		List<Double> recalls = new ArrayList<>();
 		Iterator<Result> resultsIter = results.iterator();
@@ -73,8 +73,11 @@ public class SearchResults {
 		
 		System.out.println("Total: Precision - " + totalPrecision + 
 								" Recall - " + totalRecall +
-								"F - " + f) ;
-		
-		return f;  
+								" F - " + f) ;
+		double res[] = new double[3];
+		res[0] = totalPrecision;
+		res[1] = totalRecall;
+		res[2] = f;
+		return res;
 	}
 }

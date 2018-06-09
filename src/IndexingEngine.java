@@ -50,9 +50,7 @@ public class IndexingEngine {
 	}
 
 	private void indexDocuments(String[] documents) throws IOException {
-		StandardAnalyzer analyzer = new StandardAnalyzer();
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
-		IndexWriter indexWriter = new IndexWriter(this._index, config);
+		IndexWriter indexWriter = new IndexWriter(this._index, new IndexWriterConfig(new StandardAnalyzer()));
 		for (String document : documents) {
 			document = normalizeString(document);
 
