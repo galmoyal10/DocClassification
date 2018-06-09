@@ -24,6 +24,7 @@ public class SearchEngine {
         
         //Standard Analyzer is the most sophisticated analyzer and contains removal of stop words
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer(stopWordSet));
+        this._index = ie;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(ie.getIndexDir()));
         this._relevanceThreshold = relevanceThreshold;
     }
@@ -80,12 +81,13 @@ public class SearchEngine {
         Query[] searchQueries = new Query [queries.length];
         for(int i=0; i<queries.length; ++i)
         {
-            searchQueries[i] = _queryParser.parse(IndexingEngine.normalizeString(queries[i]));
+            searchQueries[i] = _queryParser.parse(_index.normalizeString(queries[i]));
         }
         return searchQueries;
     }
     
     private IndexSearcher _indexSearcher;
+    IndexingEngine _index;
     private QueryParser _queryParser;
     private String _queryFile;
     private double _relevanceThreshold;

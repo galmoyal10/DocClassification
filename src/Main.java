@@ -11,7 +11,7 @@ public class Main {
 
             Config config = new Config(args[0]);
            
-            IndexingEngine ie = new IndexingEngine(config.docsFile, config.basicMode);
+            IndexingEngine ie = IndexFactory.getIndex(config.basicMode, config.docsFile);
             ie.run();
             
             SearchEngine se = new SearchEngine(config.queryFile, ie, ie.getCorpusTopTerms(), LuceneConstants.RELEVANCE_THRESHOLD);

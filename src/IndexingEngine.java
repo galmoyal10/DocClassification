@@ -18,51 +18,13 @@ import org.apache.lucene.misc.TermStats;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
+
 public class IndexingEngine {
-	IndexingEngine(String docsFile, boolean isBasicMode) throws Exception {
+	IndexingEngine(String docsFile) throws Exception {
 		this._index = new RAMDirectory();
 		this._docsFile = docsFile;
-		this._isBasicMode = isBasicMode;
 
-		ILLEGAL_STRINGS.put("-", " ");
-		if (!this._isBasicMode) {
-			// http://snowball.tartarus.org/algorithms/porter/stemmer.html
-			// Porter Stemmer - step 1
-			ILLEGAL_STRINGS.put("sses\\b", "ss");
-			ILLEGAL_STRINGS.put("ies\\b", "i");
-			ILLEGAL_STRINGS.put("s\\b", "");
-
-			// //Porter Stemmer - step 2
-			ILLEGAL_STRINGS.put("eed\\b", "ee");
-			ILLEGAL_STRINGS.put("ed\\b", "");
-			ILLEGAL_STRINGS.put("ing\\b", "");
-
-			ILLEGAL_STRINGS.put("at\\b", "ate");
-			ILLEGAL_STRINGS.put("bl\\b", "ble");
-			ILLEGAL_STRINGS.put("iz\\b", "ize");
-
-			ILLEGAL_STRINGS.put("ational\\b", "ate"); // relational -> relate
-			ILLEGAL_STRINGS.put("tional\\b", "tioN"); // conditional -> condition
-			ILLEGAL_STRINGS.put("enci\\b", "ence"); // valenci -> valence
-			ILLEGAL_STRINGS.put("anci\\b", "ance"); // hesitanci -> hesitance
-			ILLEGAL_STRINGS.put("izer\\b", "ize"); // digitizer -> digitize
-			ILLEGAL_STRINGS.put("abli\\b", "able"); // conformabli -> conformable
-			ILLEGAL_STRINGS.put("alli\\b", "al"); // radicalli -> radical
-			ILLEGAL_STRINGS.put("entli\\b", "ent"); // differentli -> different
-			ILLEGAL_STRINGS.put("eli\\b", "e"); // vileli - > vile
-			ILLEGAL_STRINGS.put("ousli\\b", "ous"); // analogousli -> analogous
-			ILLEGAL_STRINGS.put("ization\\b", "ize"); // vietnamization -> vietnamize
-			ILLEGAL_STRINGS.put("ation\\b", "ate"); // predication -> predicate
-			ILLEGAL_STRINGS.put("ator\\b", "ate"); // operator -> operate
-			ILLEGAL_STRINGS.put("alism\\b", "al"); // feudalism -> feudal
-			ILLEGAL_STRINGS.put("iveness\\b", "ive"); // decisiveness -> decisive
-			ILLEGAL_STRINGS.put("fulness\\b", "ful"); // hopefulness -> hopeful
-			ILLEGAL_STRINGS.put("ousness\\b", "ous"); // callousness -> callous
-			ILLEGAL_STRINGS.put("aliti\\b", "al"); // formaliti -> formal
-			ILLEGAL_STRINGS.put("iviti\\b", "ive"); // sensitiviti -> sensitive
-			ILLEGAL_STRINGS.put("biliti\\b", "ble"); // sensibiliti -> sensible
-
-		}
+		_normalizingStrings.put("-", " ");
 	}
 
 	public void run() throws Exception {
@@ -79,9 +41,9 @@ public class IndexingEngine {
 		return documents;
 	}
 
-	public static String normalizeString(String document) throws IOException {
+	public String normalizeString(String document) throws IOException {
 		document = document.toLowerCase();
-		for (Map.Entry<String, String> e : IndexingEngine.ILLEGAL_STRINGS.entrySet()) {
+		for (Map.Entry<String, String> e : this._normalizingStrings.entrySet()) {
 			document = document.replaceAll(e.getKey(), e.getValue());
 		}
 		return document;
@@ -92,7 +54,7 @@ public class IndexingEngine {
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter indexWriter = new IndexWriter(this._index, config);
 		for (String document : documents) {
-			document = IndexingEngine.normalizeString(document);
+			document = normalizeString(document);
 
 			Document d = new Document();
 			FieldType f = new FieldType();
@@ -119,8 +81,7 @@ public class IndexingEngine {
 
 	private Directory _index;
 	private String _docsFile;
-	private boolean _isBasicMode;
 	private static final String DOCUMENT_REGEX = "(?:\\*TEXT.*\\d+.*|\\*STOP)";
 	private static final int STOP_WORDS = 20;
-	private static final HashMap<String, String> ILLEGAL_STRINGS = new HashMap<>();
+	protected HashMap<String, String> _normalizingStrings = new HashMap<>();
 }
