@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -25,9 +26,9 @@ public class IndexingEngine {
 	 * @param docsFile - path to documents file
 	 * @throws Exception
 	 */
-	IndexingEngine(String docsFile) throws Exception {
+	IndexingEngine(List<DocumentInstance> docs) throws Exception {
 		this._index = new RAMDirectory();
-		this._docsFile = docsFile;
+		this._docs = docs;
 
 		_normalizingStrings.put("-", " ");
 	}
@@ -37,7 +38,7 @@ public class IndexingEngine {
 	 * @throws Exception
 	 */
 	public void run() throws Exception {
-		this.indexDocuments(this.parseDocumentsFile(this._docsFile));
+		this.indexDocuments(this._docs);
 	}
 
 	/**
@@ -46,42 +47,32 @@ public class IndexingEngine {
 	public Directory getIndex() {
 		return this._index;
 	}
-	
+	/*
 	private String[] parseDocumentsFile(String documentsFilePath) throws IOException {
 		String documentsString = new String(Files.readAllBytes(Paths.get(documentsFilePath)));
 		String[] documents = documentsString.split(DOCUMENT_REGEX);
 		return documents;
-	}
+	}*/
 
-	/**
-	 * normalizing method used for both documents and queries
-	 * @param input - the string to normalize
-	 * @return the normalized string
-	 * @throws IOException
-	 */
-	public String normalizeString(String input) throws IOException {
-		input = input.toLowerCase();
-		for (Map.Entry<String, String> e : this._normalizingStrings.entrySet()) {
-			input = input.replaceAll(e.getKey(), e.getValue());
-		}
-		return input;
-	}
+
 
 	/**
 	 * performs the indexing
 	 * @param documents - an array of documents
 	 * @throws IOException
 	 */
-	private void indexDocuments(String[] documents) throws IOException {
+	private void indexDocuments(List<DocumentInstance> documents) throws IOException {
 		IndexWriter indexWriter = new IndexWriter(this._index, new IndexWriterConfig(new StandardAnalyzer()));
-		for (String document : documents) {
-			document = normalizeString(document);
+		for (DocumentInstance document : documents) {
+			document.normalize(this._normalizingStrings);
 
 			Document d = new Document();
 			FieldType f = new FieldType();
 			f.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
-			Field content = new Field(LuceneConstants.CONTENTS, document, f);
+			Field content = new Field(LuceneConstants.CONTENTS, document.content, f);
+			Field title = new Field(LuceneConstants.TITLE, document.title, f);
 			d.add(content);
+			d.add(title);
 			indexWriter.addDocument(d);
 		}
 		indexWriter.close();
@@ -105,7 +96,7 @@ public class IndexingEngine {
 	}
 
 	private Directory _index;
-	private String _docsFile;
+	private List<DocumentInstance> _docs;
 	private static final String DOCUMENT_REGEX = "(?:\\*TEXT.*\\d+.*|\\*STOP)";
 	private static final int STOP_WORDS_SIZE = 20;
 	protected HashMap<String, String> _normalizingStrings = new HashMap<>();

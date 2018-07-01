@@ -19,15 +19,15 @@ import org.apache.lucene.search.similarities.ClassicSimilarity;
 public class SearchEngine {
     /**
      * c'tor
-     * @param queriesFile - path to queries file
+     * @param testDocs - path to queries file
      * @param index - documents index
      * @param stopWords - stop words to use when searching
      * @param relevanceThreshold - threshold to apply on result's scores.
      * @throws IOException
      */
-    SearchEngine(String queriesFile, IndexingEngine index, String [] stopWords, double relevanceThreshold) throws IOException
+    SearchEngine(List<DocumentInstance> testDocs, IndexingEngine index, String [] stopWords, double relevanceThreshold) throws IOException
     {
-        this._queryFile = queriesFile;
+        this._testDocs = testDocs;
         CharArraySet stopWordSet = new CharArraySet(Arrays.asList(stopWords),true);
         
         //Standard Analyzer is the most sophisticated analyzer and contains removal of stop words
@@ -72,7 +72,7 @@ public class SearchEngine {
 	 */
     public List<Result> searchQueries() throws IOException, ParseException
     {
-        Query [] queries = this.parseQueriesFile(this._queryFile);
+        Query [] queries = this.parseTestDocs(this._testDocs);
         TopDocs[] results = new TopDocs[queries.length];
         
         for(int i=0; i<queries.length;++i)
@@ -86,24 +86,25 @@ public class SearchEngine {
         return filterResults(results, this._relevanceThreshold);
     }
     
-    private Query[] parseQueriesFile(String queriesFilePath) throws IOException, ParseException {
-        String queriesString = new String(Files.readAllBytes(Paths.get(queriesFilePath)));
-        String[] queries = queriesString.split(QUERY_REGEX);
-        //remove first empty string as a result of split
-        queries = Arrays.copyOfRange(queries, 1, queries.length);
+    private Query[] parseTestDocs(List<DocumentInstance> testDocs) throws IOException, ParseException {
         
-        Query[] searchQueries = new Query [queries.length];
-        for(int i=0; i<queries.length; ++i)
-        {
-            searchQueries[i] = _queryParser.parse(_index.normalizeString(queries[i]));
-        }
+    	Query[] searchQueries = new Query [testDocs.size()];
+    	int cnt = 0;
+    	
+    	for(DocumentInstance doc : testDocs)
+    	{
+    		doc.normalize(_index._normalizingStrings);
+    		searchQueries[cnt] = _queryParser.parse(doc.content);
+    		cnt++;
+    	}
+    	
         return searchQueries;
     }
     
     protected IndexSearcher _indexSearcher;
     IndexingEngine _index;
     private QueryParser _queryParser;
-    private String _queryFile;
+    private List<DocumentInstance> _testDocs;
     private double _relevanceThreshold;
     private static final String QUERY_REGEX = "\\*FIND\\s*\\d+.*";
 }

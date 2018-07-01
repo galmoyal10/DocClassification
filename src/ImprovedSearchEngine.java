@@ -1,11 +1,12 @@
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.lucene.search.similarities.BM25Similarity;
 
 public class ImprovedSearchEngine extends SearchEngine{
-	ImprovedSearchEngine(String queryFile, IndexingEngine ie, String [] stopWords, double relevanceThreshold) throws IOException
+	ImprovedSearchEngine(List<DocumentInstance> testDocs, IndexingEngine ie, String [] stopWords, double relevanceThreshold) throws IOException
 	{
-		super(queryFile, ie, stopWords, relevanceThreshold);
+		super(testDocs, ie, stopWords, relevanceThreshold);
 		_indexSearcher.setSimilarity(new BM25Similarity());
 	}
 }

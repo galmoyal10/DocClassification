@@ -1,8 +1,10 @@
+import java.util.List;
+
 /**
  * Implements stemming method used for normalizing both documents and queries
  */
 public class ImprovedIndexingEngine extends IndexingEngine{
-	ImprovedIndexingEngine(String docsFile) throws Exception {
+	ImprovedIndexingEngine(List<DocumentInstance> docsFile) throws Exception {
 		super(docsFile);
 		// http://snowball.tartarus.org/algorithms/porter/stemmer.html
 		// Porter Stemmer - step 1
