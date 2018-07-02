@@ -7,5 +7,10 @@ public class ClassifiedDocument extends DocumentInstance {
 		super(docId, truelabel, title, content);
 		this.classificationLabel = classifiedLabel;
 	}
+	
+	public ClassifiedDocument(DocumentInstance doc, int classifiedLabel) {
+		super(doc);
+		this.classificationLabel = classifiedLabel;
+	}
 
 }

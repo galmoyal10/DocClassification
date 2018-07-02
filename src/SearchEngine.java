@@ -21,17 +21,13 @@ public class SearchEngine {
      * c'tor
      * @param testDocs - path to queries file
      * @param index - documents index
-     * @param stopWords - stop words to use when searching
      * @param relevanceThreshold - threshold to apply on result's scores.
      * @throws IOException
      */
-    SearchEngine(List<DocumentInstance> testDocs, IndexingEngine index, String [] stopWords, double relevanceThreshold) throws IOException
+    SearchEngine(List<DocumentInstance> testDocs, IndexingEngine index, double relevanceThreshold) throws IOException
     {
         this._testDocs = testDocs;
-        CharArraySet stopWordSet = new CharArraySet(Arrays.asList(stopWords),true);
-        
-        //Standard Analyzer is the most sophisticated analyzer and contains removal of stop words
-        this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer(stopWordSet));
+        this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
         this._index = index;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(index.getIndex()));
         _indexSearcher.setSimilarity(new ClassicSimilarity());
@@ -47,7 +43,7 @@ public class SearchEngine {
 	 */
 	static List<Result> filterResults(TopDocs[] results, Double threashold) {
 		List<Result> parsedResults = new ArrayList<>();
-		Integer queryId = 1;
+		Integer queryId = 0;
 		for (TopDocs result: results) 
 		{
 			List<Integer> docIds = new ArrayList<>();
@@ -55,7 +51,7 @@ public class SearchEngine {
             {
             	if(score.score >= threashold)
             	{
-            		docIds.add(score.doc);            		
+            		docIds.add(score.doc);
             	}
             }
 			parsedResults.add(new Result(queryId, docIds.toArray(new Integer[docIds.size()])));

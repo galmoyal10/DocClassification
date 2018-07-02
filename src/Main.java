@@ -1,76 +1,52 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+
 
 public class Main {
     public static void main(String[] args) {
         try {           
 
-        	Config config = new Config("C:\\Users\\GALMOYAL\\Documents\\DocClassification\\Externals\\parameters.txt");
+        	Config config = new Config(args[0]);
             List<DocumentInstance> trainDocs = CsvParser.parse(config.trainFile);
             
             IndexingEngine ie = IndexFactory.getIndex(false, trainDocs);
             ie.run();
             
             List<DocumentInstance> testDocs = CsvParser.parse(config.testFile);
-    		SearchEngine se = SearchEngineFactory.getSE(false, testDocs, ie, ie.getCorpusTopTerms());
+    		SearchEngine se = new SearchEngine(testDocs, ie, LuceneConstants.BASIC_RELEVANCE_THRESHOLD);
     		List<Result> results = se.searchQueries();
     		
-    		ArrayList<ClassifiedDocument> resultDocs = new ArrayList<ClassifiedDocument>();
+    		ArrayList<ClassifiedDocument> classifications = new ArrayList<ClassifiedDocument>();
     		
+    		
+    		//TODO - move this shit to KNNClassifier query one document at a time
     		for(Result result : results)
     		{
-    			int []classHist = new int[256];
+    			// filling a map of class to the the number of neighbors that match it
+    			Map<Integer, Integer> possibleClasses = new HashMap<Integer, Integer>();
     			for (Integer docId: result.documents) 
     			{
-    				// TODO: make this more efficient.
-    				Optional<DocumentInstance> doc = trainDocs.stream().filter(item->item.docId==docId).findFirst();
-    				if(!doc.isPresent())
-    				{
-    					System.out.println("WTFFF?!?!");
-    				}
-                    classHist[doc.get().docId]++;
+    				Integer possibleClassification = trainDocs.get(docId).label;
+    				Integer classificationCount = possibleClasses.getOrDefault(possibleClassification, 0);
+    				possibleClasses.put(possibleClassification, ++classificationCount);
                 }
-    			
-    			//Collections.max((Collection<? extends T>) Arrays.asList(classHist));
+    			int maxClassificationCount = 0;
+    			int classification = 0;
+    			for (Map.Entry<Integer, Integer> possibleClassification : possibleClasses.entrySet()) {
+    				if (possibleClassification.getValue() > maxClassificationCount) {
+    					maxClassificationCount = possibleClassification.getValue();
+    					classification = possibleClassification.getKey();
+    				}
+    			}
+    			Integer testDocId = result.queryId;
+    			System.out.println("docID" + testDocId + " classified " + classification + " with " + maxClassificationCount + " neighbours");
+    			System.out.println("docID true label " + testDocs.get(testDocId).label);
+    			classifications.add(new ClassifiedDocument(testDocs.get(testDocId), classification));
     		}
-    		/*
-    		writeResults(config.outputFile, results);
-    		if (config.truthFile != null) {    			
-    			List<Result> truth = SearchResults.loadFromFile(config.truthFile);
-    			double[] res = SearchResults.compareSearchResults(results, truth);
-    		}*/
-    		
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    private static void writeResults(String fileName, List<Result> results) throws IOException {
-        File outFile = new File(fileName);
-        if (outFile.exists()) {
-            outFile.delete();
-        } else {
-            outFile.createNewFile();
-        }
-        BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
-        Integer queryId = 1;
-        for (Result result: results) {
-            String resultFormat = queryId.toString();
-            for (Integer docId: result.documents) {
-                resultFormat += " " + Integer.toString(docId);          
-            }
-            writer.write(resultFormat);
-            writer.newLine();
-            ++queryId;
-        }
-        writer.close();
     }
 }

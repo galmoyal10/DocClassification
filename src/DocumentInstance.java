@@ -3,6 +3,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.queryparser.classic.QueryParser;
+
 /**
  * represents a single document, its tf-idf vector and its true label
  */
@@ -12,6 +14,13 @@ public class DocumentInstance {
 		this.label = label;
 		this.title = title;
 		this.content = content;
+	}
+	
+	public DocumentInstance(DocumentInstance other) {
+		this.docId = other.docId;
+		this.label = other.label;
+		this.title = other.title;
+		this.content = other.content;
 	}
 	
 	public int docId;
@@ -37,7 +46,7 @@ public class DocumentInstance {
 		for (Map.Entry<String, String> e : normalizingStrings.entrySet()) {
 			input = input.replaceAll(e.getKey(), e.getValue());
 		}
-		return input;
+		return QueryParser.escape(input);
 	}
 	
 }

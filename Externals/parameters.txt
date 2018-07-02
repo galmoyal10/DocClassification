@@ -1,5 +1,0 @@
-queryFile=Externals/queries.txt
-docsFile=Externals/docs.txt
-outputFile=out/output.txt
-retrievalAlgorithm=basic
-truthFile=Externals/truth.txt
