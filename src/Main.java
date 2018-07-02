@@ -11,7 +11,7 @@ public class Main {
         	Config config = new Config(args[0]);
             List<DocumentInstance> trainDocs = CsvParser.parse(config.trainFile);
             
-            IndexingEngine ie = IndexFactory.getIndex(false, trainDocs);
+            IndexingEngine ie = new ImprovedIndexingEngine(trainDocs);
             ie.run();
             
             List<DocumentInstance> testDocs = CsvParser.parse(config.testFile);
