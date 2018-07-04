@@ -15,33 +15,15 @@ public class SearchEngine {
     /**
      * c'tor
      * @param index - documents index
-     * @param relevanceThreshold - threshold to apply on result's scores.
      * @throws IOException
      */
-    SearchEngine(IndexingEngine index, double relevanceThreshold) throws IOException {
+    SearchEngine(IndexingEngine index, Integer k) throws IOException {
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
         this._index = index;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(index.getIndex()));
         _indexSearcher.setSimilarity(new ClassicSimilarity());
-        this._relevanceThreshold = relevanceThreshold;
+        this._k = k;
     }
-    
-    
-	/**
-	 * formats search engine result of a query with relevance filtration
-	 * @param result - result from search engine
-	 * @param threashold - the T value of relevance threshold to enforce 
-	 * @return
-	 */
-	static Result filterResults(TopDocs result, Integer docId, Double threashold) {
-		List<Integer> docIds = new ArrayList<>();
-        for (ScoreDoc score: result.scoreDocs) {
-        	if(score.score >= threashold) {
-        		docIds.add(score.doc);
-        	}
-        }
-		return new Result(docId, docIds.toArray(new Integer[docIds.size()]));
-	}
     
 	/**
 	 * performs a query on the index with the given doc
@@ -54,8 +36,14 @@ public class SearchEngine {
         // tf-idf scoring - 
         // https://lucene.apache.org/core/3_5_0/scoring.html#Scoring
         // https://lucene.apache.org/core/3_5_0/api/core/org/apache/lucene/search/Similarity.html
-        TopDocs result = this._indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
-        return filterResults(result, doc.docId, this._relevanceThreshold);
+        TopDocs result = this._indexSearcher.search(query, this._k);
+        
+        // formatting result
+        List<Integer> docIds = new ArrayList<>();
+        for (ScoreDoc score: result.scoreDocs) {
+        		docIds.add(score.doc);
+        }
+		return new Result(doc.docId, docIds.toArray(new Integer[docIds.size()]));
     }
     
     /**
@@ -70,5 +58,5 @@ public class SearchEngine {
     protected IndexSearcher _indexSearcher;
     IndexingEngine _index;
     private QueryParser _queryParser;
-    private double _relevanceThreshold;
+    private Integer _k;
 }

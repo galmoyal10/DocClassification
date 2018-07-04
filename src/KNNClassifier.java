@@ -5,11 +5,11 @@ import java.util.Map;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 public class KNNClassifier {
-	KNNClassifier(List<DocumentInstance> trainingSet) throws Exception {
+	KNNClassifier(List<DocumentInstance> trainingSet, Integer k) throws Exception {
 		_trainingSet = trainingSet;
 		_index = new IndexingEngine(trainingSet);
 		_index.run();
-		_neighborsRetriever = new SearchEngine(_index, LuceneConstants.BASIC_RELEVANCE_THRESHOLD);
+		_neighborsRetriever = new SearchEngine(_index, k);
 	}
 	
 	ClassifiedDocument classify(DocumentInstance testDoc) throws Exception, ParseException {
