@@ -1,5 +1,9 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class Main {
@@ -8,16 +12,59 @@ public class Main {
 
         	Config config = new Config(args[0]);
             List<DocumentInstance> trainDocs = CsvParser.parse(config.trainFile);
-            Integer k = 6;
-            KNNClassifier classifier = new KNNClassifier(trainDocs, k);
+            KNNClassifier classifier = new KNNClassifier(trainDocs);
+            
             
             List<DocumentInstance> testDocs = CsvParser.parse(config.testFile);
-            List<ClassifiedDocument> classifications = new ArrayList<ClassifiedDocument>();
-    		for (DocumentInstance testDoc: testDocs) {
-    			classifications.add(classifier.classify(testDoc));
-    		}
+            Map<Integer, Label> labelBenchmark = new HashMap<Integer, Label>();
+        	for (int k = 1; k < 100; ++k) {
+        		System.out.println("Starting batch with k " + k);
+                classifier.setK(k);
+        		for (DocumentInstance testDoc: testDocs) {
+        			ClassifiedDocument classification = classifier.classify(testDoc);
+        			// ensure existence of labels in benchmark
+        			if (!labelBenchmark.containsKey(testDoc.label)) {
+        				labelBenchmark.put(testDoc.label, new Label(testDoc.label));
+        			}
+        			if (!labelBenchmark.containsKey(classification.classificationLabel)) {
+        				labelBenchmark.put(classification.classificationLabel, new Label(classification.classificationLabel));
+        			}
+        			Label trueLabel = labelBenchmark.get(classification.label);
+        			// document is counted in its true label anyway
+        			trueLabel.totalDocs++;
+        			if (classification.label == classification.classificationLabel) {
+        				// if labels are equal, counted as a true positive in the true label
+        				trueLabel.truePositive++;
+        			} else {
+        				// else, counted as a false positive in the classified label
+        				Label classifiedLabel = labelBenchmark.get(classification.classificationLabel);
+        				classifiedLabel.falsePositive++;
+        			}
+        		}
+        		
+        		Double totalF = 0.0;
+        		Double totalTP = 0.0;
+        		Double totalFP = 0.0;
+        		for (Map.Entry<Integer, Label> label: labelBenchmark.entrySet()) {
+        			Label currentLabel = label.getValue();
+        			totalF += currentLabel.harmonicMean();
+        			totalTP += currentLabel.truePositive;
+        			totalFP += currentLabel.falsePositive;
+        			System.out.println(label.getValue().toString());
+        			System.out.println("*********************");
+        		}
+        		
+    			Double macro = totalF / (double)labelBenchmark.size();
+    			System.out.println("macro: " + macro);
+    			Double totalPrecision = Statistics.precision(totalTP, totalFP);
+    			Double totalRecall = Statistics.recall(totalTP, (double)testDocs.size());
+    			Double micro = Statistics.harmonicMean(totalPrecision, totalRecall);
+    			System.out.println("micro: " + micro);
+        		System.out.println("*********************************");
+        		System.out.println("*********************************");
+        	}
     		// TODO - calc optimal k
-    		// TODO - calc micro and macro
+        	// TODO - write results to a file
         } catch (Exception e) {
             e.printStackTrace();
         }

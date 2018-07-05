@@ -5,11 +5,15 @@ import java.util.Map;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 public class KNNClassifier {
-	KNNClassifier(List<DocumentInstance> trainingSet, Integer k) throws Exception {
+	KNNClassifier(List<DocumentInstance> trainingSet) throws Exception {
 		_trainingSet = trainingSet;
 		_index = new IndexingEngine(trainingSet);
 		_index.run();
-		_neighborsRetriever = new SearchEngine(_index, k);
+		_neighborsRetriever = new SearchEngine(_index);
+	}
+	
+	public void setK(Integer k) {
+		this._neighborsRetriever.setK(k);
 	}
 	
 	ClassifiedDocument classify(DocumentInstance testDoc) throws Exception, ParseException {
@@ -29,8 +33,6 @@ public class KNNClassifier {
 				classification = possibleClassification.getKey();
 			}
 		}
-		System.out.println("docID" + testDoc.docId + " classified " + classification + " with " + maxClassificationCount + " neighbours");
-		System.out.println("docID true label " + testDoc.label);
 		return new ClassifiedDocument(testDoc, classification);
 	}
 	

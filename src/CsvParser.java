@@ -38,11 +38,19 @@ public class CsvParser {
         
         // Parse String[] to docs
         List<DocumentInstance> processedTrainDocuments = new ArrayList<DocumentInstance>();
+        Integer c = 0;
         for (String[] row: rows) {
-        	processedTrainDocuments.add(new DocumentInstance(Integer.parseInt(row[Config.DOC_ID_FIELD])
-										        			, Integer.parseInt(row[Config.LABEL_FIELD])
-															, row[Config.TITLE_FIELD],
-															row[Config.CONTENT_FIELD]));
+        	try {
+        		c++;
+        		processedTrainDocuments.add(new DocumentInstance(Integer.parseInt(row[Config.DOC_ID_FIELD])
+	        			, Integer.parseInt(row[Config.LABEL_FIELD])
+						, row[Config.TITLE_FIELD],
+						row[Config.CONTENT_FIELD]));	
+        	} catch (Exception e) {
+        		System.out.println(row[0]);
+        		
+        	}
+        	
         }
         
         return processedTrainDocuments;

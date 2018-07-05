@@ -17,12 +17,16 @@ public class SearchEngine {
      * @param index - documents index
      * @throws IOException
      */
-    SearchEngine(IndexingEngine index, Integer k) throws IOException {
+    SearchEngine(IndexingEngine index) throws IOException {
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
         this._index = index;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(index.getIndex()));
         _indexSearcher.setSimilarity(new ClassicSimilarity());
-        this._k = k;
+        this._k = 0;
+    }
+    
+    public void setK(Integer k) {
+    	this._k = k;
     }
     
 	/**
