@@ -16,8 +16,8 @@ public class Main {
             
             
             List<DocumentInstance> testDocs = CsvParser.parse(config.testFile);
-            Map<Integer, Label> labelBenchmark = new HashMap<Integer, Label>();
         	for (int k = 1; k < 100; ++k) {
+        		Map<Integer, Label> labelBenchmark = new HashMap<Integer, Label>();
         		System.out.println("Starting batch with k " + k);
                 classifier.setK(k);
         		for (DocumentInstance testDoc: testDocs) {
