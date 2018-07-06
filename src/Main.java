@@ -1,5 +1,6 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +82,6 @@ public class Main {
         		System.out.println("*********************************");
         	}
     		// TODO - calc optimal k
-        	// TODO - write results to a file
         	writeResultFile(testResults, config.outputFile);
         } catch (Exception e) {
             e.printStackTrace();
