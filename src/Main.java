@@ -7,6 +7,19 @@ import java.util.Set;
 
 
 public class Main {
+	
+	public static void writeResultFile(List<ClassifiedDocument> results, String outputPath) throws IOException
+	{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath));
+		
+		for(ClassifiedDocument res : results)
+		{
+			writer.write(res.docId + ", " + res.classificationLabel + ", " + res.label + "\n");
+		}
+		
+		writer.close();
+	}
+	
     public static void main(String[] args) {
         try {           
 
@@ -40,6 +53,8 @@ public class Main {
         				Label classifiedLabel = labelBenchmark.get(classification.classificationLabel);
         				classifiedLabel.falsePositive++;
         			}
+        			
+        			testResults.add(classification);
         		}
         		
         		Double totalF = 0.0;
@@ -65,6 +80,7 @@ public class Main {
         	}
     		// TODO - calc optimal k
         	// TODO - write results to a file
+        	writeResultFile(testResults, config.outputFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
