@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +28,7 @@ public class Main {
         	Config config = new Config(args[0]);
             List<DocumentInstance> trainDocs = CsvParser.parse(config.trainFile);
             KNNClassifier classifier = new KNNClassifier(trainDocs);
-            
+            ArrayList<ClassifiedDocument> testResults = new ArrayList<ClassifiedDocument>();
             
             List<DocumentInstance> testDocs = CsvParser.parse(config.testFile);
         	for (int k = 1; k < 100; ++k) {
