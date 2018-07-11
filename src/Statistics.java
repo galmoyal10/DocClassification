@@ -1,4 +1,6 @@
-
+/**
+ * utility statistics functions
+ */
 public class Statistics {
 	public static Double precision(Double tp, Double fp) {
 		return tp / (tp + fp);

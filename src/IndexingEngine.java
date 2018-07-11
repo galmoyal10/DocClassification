@@ -55,9 +55,7 @@ public class IndexingEngine {
 			FieldType f = new FieldType();
 			f.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
 			Field content = new Field(LuceneConstants.CONTENTS, document.content, f);
-			Field title = new Field(LuceneConstants.TITLE, document.title, f);
 			d.add(content);
-			d.add(title);
 			indexWriter.addDocument(d);
 		}
 		indexWriter.close();

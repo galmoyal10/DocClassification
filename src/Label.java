@@ -1,4 +1,7 @@
 
+/**
+ * Represents the statistics of a single label over a classification batch
+ */
 public class Label {
 	Label(Integer label) {
 		this.label = label;

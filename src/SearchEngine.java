@@ -18,6 +18,7 @@ public class SearchEngine {
      * @throws IOException
      */
     SearchEngine(IndexingEngine index) throws IOException {
+    	
         this._queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
         this._index = index;
         this._indexSearcher = new IndexSearcher(DirectoryReader.open(index.getIndex()));
@@ -25,6 +26,10 @@ public class SearchEngine {
         this._k = 0;
     }
     
+    /**
+     * sets the K parameter for k nearest neighbors
+     * @param k
+     */
     public void setK(Integer k) {
     	this._k = k;
     }
@@ -57,7 +62,7 @@ public class SearchEngine {
     private Query noramlizeDoc(DocumentInstance doc) throws Exception {
 		doc.normalize(_index._normalizingStrings);
 		return _queryParser.parse(doc.content);
-    }
+	}
     
     protected IndexSearcher _indexSearcher;
     IndexingEngine _index;
